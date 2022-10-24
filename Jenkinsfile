@@ -2,6 +2,7 @@ pipeline {
   agent any
   
   stages {
+
     stage('Build Docker Image') {
       steps {
         script {
@@ -9,6 +10,7 @@ pipeline {
         }
       }
     }
+
     stage('Push Docker Image') {
       steps {
         script {
@@ -17,6 +19,14 @@ pipeline {
             dockerapp.push("${env.BUILD_ID}")
           }
 
+        }
+      }
+    }
+
+    stage('Deploy kubernetes') {
+      steps {
+        withKubeconfid([credentialsId: 'kubeconfig']) {
+          sh 'kubectl apply -f ./k8s/deployment.yaml'
         }
       }
     }
